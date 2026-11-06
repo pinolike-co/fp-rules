@@ -1,0 +1,7 @@
+should_match:
+  - { purl: "pkg:cargo/wiremock@0.6.5", cve: CVE-2018-9116 }
+  - { purl: "pkg:cargo/wiremock@0.5.22", cve: CVE-2023-41329 }
+should_not_match:
+  - { purl: "pkg:maven/org.wiremock/wiremock-standalone@3.9.1", cve: CVE-2018-9116 }   # Java 는 보여야 한다
+  - { purl: "pkg:pypi/wiremock@2.6.0", cve: CVE-2023-41329 }                            # Python 클라이언트도 보여야 한다
+  - { purl: "pkg:cargo/wiremock@0.6.5", cve: CVE-2026-99999 }                           # 다른 CVE 는 보여야 한다
