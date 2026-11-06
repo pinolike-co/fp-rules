@@ -1,0 +1,49 @@
+# PR 마다 규칙을 검사하고 결과를 PR 댓글로 남긴다.
+# 브랜치 보호에서 이 작업(check)을 "필수 상태 검사"로 지정한다.
+name: check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write        # 결과 댓글
+
+concurrency:
+  group: check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # 기준 브랜치(origin/main)와 비교해 지운 규칙을 찾는다
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: 규칙 검사
+        id: check
+        run: |
+          set +e
+          python tools/check.py --base origin/${{ github.base_ref }} --report report.md
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+
+      - name: PR 댓글 (직전 댓글이 있으면 고친다)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body-file report.md --edit-last \
+            || gh pr comment ${{ github.event.pull_request.number }} --body-file report.md
+
+      - name: 검사 결과로 작업 성패 결정
+        if: steps.check.outputs.exit != '0'
+        run: exit 1

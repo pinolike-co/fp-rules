@@ -1,0 +1,18 @@
+# 새 규칙: 이 파일을 rules/FP-<번호>-<생태계>-<이름>.yaml 로 복사해 채운다.
+# 번호는 rules/ 에서 가장 큰 번호 + 1. 한 번 쓴 번호는 다시 쓰지 않는다.
+id: FP-0000
+status: active
+cves:
+  - CVE-0000-00000
+match:
+  purl_type: cargo          # cargo · maven · pypi · golang · npm · nuget · gem …
+  # purl_namespace: org.example   # maven 그룹 등. 필요할 때만
+  purl_name: example
+  versions: "*"             # 또는 목록: ["1.2.3", "1.2.4"]
+reason:
+  ko: 왜 오탐인지 고객이 읽을 문장으로 쓴다(10자 이상).
+  en: Why this is a false positive, in a sentence a customer can read.
+evidence:
+  - https://nvd.nist.gov/vuln/detail/CVE-0000-00000
+verified_by: 이름 (PINO 보안팀)
+verified_at: 2026-01-01

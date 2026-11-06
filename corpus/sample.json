@@ -1,0 +1,5 @@
+{"bomFormat":"CycloneDX","specVersion":"1.6","components":[
+ {"type":"application","name":"uv","version":"0.12.5","purl":"pkg:cargo/uv@0.12.5","components":[
+   {"type":"library","name":"wiremock","version":"0.6.5","purl":"pkg:cargo/wiremock@0.6.5"}]},
+ {"type":"library","name":"wiremock-standalone","version":"3.9.1","purl":"pkg:maven/org.wiremock/wiremock-standalone@3.9.1"},
+ {"type":"library","name":"openssl","version":"3.5.4","cpe":"cpe:2.3:a:openssl:openssl:3.5.4:*:*:*:*:*:*:*"}]}

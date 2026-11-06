@@ -1,0 +1,68 @@
+# main 에 규칙이 머지되면 묶음을 만들어 GitHub Release 로 발행한다.
+# 고객 avm-mirror 는 releases/latest/download/{version.txt,fp-rules.json} 을 받는다.
+name: release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "rules/**"
+      - "schema/**"
+      - "tools/**"
+  workflow_dispatch: {}         # 수동 재발행 (Actions 탭 → release → Run workflow)
+
+permissions:
+  contents: write               # Release 생성
+
+concurrency:
+  group: release                # 동시에 두 번 발행하지 않는다 — 버전 번호가 겹친다
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: 발행 전 검사 (PR 검사와 같은 것)
+        run: python tools/check.py
+
+      - name: 버전 매기기 (YYYY.MM.DD.N, UTC 기준)
+        id: ver
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          today=$(date -u +%Y.%m.%d)
+          n=$(gh release list --limit 100 --json tagName \
+                --jq "[.[] | select(.tagName | startswith(\"${today}.\"))] | length")
+          echo "version=${today}.$((n + 1))" >> "$GITHUB_OUTPUT"
+
+      - name: 직전 발행본 받기 (첫 발행이면 없음)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p prev
+          gh release download --pattern fp-rules.json --dir prev || echo "직전 발행본 없음 — 첫 발행"
+
+      - name: 묶음 만들기
+        run: |
+          python tools/build.py --version "${{ steps.ver.outputs.version }}" \
+            --previous prev/fp-rules.json --out dist
+
+      - name: GitHub Release 발행
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.ver.outputs.version }}" \
+            dist/fp-rules.json dist/version.txt \
+            --title "오탐 규칙 ${{ steps.ver.outputs.version }}" \
+            --notes-file dist/notes.md \
+            --target "${{ github.sha }}" \
+            --latest

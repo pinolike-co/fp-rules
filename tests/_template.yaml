@@ -1,0 +1,5 @@
+# tests/FP-<번호>.yaml 로 복사한다. 양쪽 모두 하나 이상.
+should_match:              # 이 컴포넌트·취약점은 숨겨져야 한다
+  - { purl: "pkg:cargo/example@1.0.0", cve: CVE-0000-00000 }
+should_not_match:          # 이건 보여야 한다 (이름이 같은 다른 생태계, 다른 CVE 등)
+  - { purl: "pkg:maven/org.example/example@1.0.0", cve: CVE-0000-00000 }
