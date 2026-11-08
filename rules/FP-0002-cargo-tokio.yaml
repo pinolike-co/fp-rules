@@ -1,0 +1,18 @@
+id: FP-0002
+status: active
+cves:
+  - CVE-2024-27308
+match:
+  purl_type: cargo
+  purl_name: tokio
+  versions: "*"
+reason:
+  ko: CVE-2024-27308은 Rust 크레이트 mio(0.7.2 이상 0.8.11 미만)가 Windows named pipe 에서 해제된 토큰을 돌려주는 결함이다. GitHub 권고 GHSA-r8w9-5wcg-vfj7도 cargo mio 만 기록한다. NVD 는 mio 를 쓰는 tokio 를 상한 없이(1.30.0 이상) CPE 로 묶어 최신 tokio 까지 걸리지만, tokio 크레이트 자체에는 결함이 없다. tokio 1.39.0 이상은 mio ^1.0.1 을 요구해 결함 있는 mio 와 함께 쓸 수 없다. 1.30~1.38(mio ^0.8.6·^0.8.9)이 결함 있는 mio 와 함께 설치된 경우에는 mio 컴포넌트에 같은 CVE 가 GHSA·Trivy 로 따로 판정되므로, tokio 행을 숨겨도 실제 노출은 mio 행에 남는다.
+  en: CVE-2024-27308 is a defect in the Rust crate mio (>=0.7.2, <0.8.11) that returns tokens for already-deregistered named pipes on Windows. GitHub advisory GHSA-r8w9-5wcg-vfj7 lists only cargo mio. NVD also attaches tokio (>=1.30.0, no upper bound) through a CPE because tokio uses mio, but the tokio crate itself contains no defect. tokio 1.39.0 and later require mio ^1.0.1 and cannot be built with the vulnerable mio. When tokio 1.30–1.38 (mio ^0.8.6 / ^0.8.9) ships with a vulnerable mio, the mio component is judged separately for the same CVE via GHSA and Trivy, so hiding the tokio row leaves the real exposure visible on the mio row.
+evidence:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-27308
+  - https://github.com/advisories/GHSA-r8w9-5wcg-vfj7
+  - https://github.com/tokio-rs/mio/security/advisories/GHSA-r8w9-5wcg-vfj7
+  - https://crates.io/crates/tokio/1.39.0/dependencies
+verified_by: PINO 보안팀
+verified_at: "2026-11-08"
