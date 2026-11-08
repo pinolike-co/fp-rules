@@ -1,0 +1,7 @@
+should_match:
+  - { purl: "pkg:cargo/tokio@1.53.1", cve: CVE-2024-27308 }
+  - { purl: "pkg:cargo/tokio@1.30.0", cve: CVE-2024-27308 }
+should_not_match:
+  - { purl: "pkg:cargo/mio@0.8.10", cve: CVE-2024-27308 }      # 결함이 있는 mio 는 보여야 한다
+  - { purl: "pkg:cargo/tokio@1.53.1", cve: CVE-2026-99999 }    # 다른 CVE 는 보여야 한다
+  - { purl: "pkg:npm/tokio@1.0.0", cve: CVE-2024-27308 }       # 다른 생태계는 건드리지 않는다
